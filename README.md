@@ -1,1 +1,1 @@
-[thing](dez1023.github.io/bruhviewer)
+[thing](https://dez1023.github.io/bruhviewer)
