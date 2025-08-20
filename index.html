@@ -1,5 +1,11 @@
 <html>
   
+  <head>
+      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+</head>
+  
   <body>
     <div id="urlBar">
       <input id="urlInput" type="url" placeholder="https://example.com" value="https://example.com">
@@ -7,55 +13,93 @@
       <input id="zoomInput" type="range" min="50" max="200" value="100" step="10">
       <label for="zoomInput">Zoom</label>
     </div>
-    <iframe id="mainFrame"></iframe>
+      <iframe id="mainDisplay"></iframe>
   </body>
 
   <script>
     const urlInput = document.getElementById("urlInput");
     const goButton = document.getElementById("goButton");
     const zoomInput = document.getElementById("zoomInput")
-    const mainFrame = document.getElementById("mainFrame");
-    
+    const mainDisplay = document.getElementById("mainDisplay");
+
     function displayWebsite() {
       const url = urlInput.value;
       if (url) {
         console.log("valid");
-        mainFrame.src = url;
+        mainDisplay.src = url;
       }else{
         console.log("naw");
       }
     }
     
+    function updateDisplay() {
+      const scale = event.target.value;
+      const scaleRatio = scale/100;
+      const parent = mainDisplay.parentNode;
+      mainDisplay.style.zoom = scale +"%";
+      mainDisplay.style.width = "100%";
+      mainDisplay.style.height = "100%";
+    }
+    
+    
+$("#mainDisplay").dialog({
+  dialogClass: "no-close",
+  iframeFix: true,
+  resize: updateDisplay,
+});
+
+$( ".ui-dialog" ).on("resizestart", function( event, ui ) {mainDisplay.style.pointerEvents = "none"} );
+
+$( ".ui-dialog" ).on("resizestop", function( event, ui ) {mainDisplay.style.pointerEvents = "auto"} );
+    
     zoomInput.addEventListener("input", (event) => {
-      mainFrame.style.transform = "scale("+ event.target.value/100 +")"
+      updateDisplay();
     });
+    
   </script>
   
   <style>
   
     body {
       margin: 0;
+      user-select: none;
+      background: #504c54;
     }
   
     #urlBar {
       position: fixed;
       z-index: 10;
       padding: 5px;
-      border-radius: 0 0 5px 5px;
+      border-radius: 0 0 0px 5px;
       box-shadow: 0px 0px 3px rgba(0,0,0,0.5);
       background: white;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 0;
     }
-  
-    #mainFrame {
-      resize: both;
-      overflow: auto;
-      position: fixed;
+    
+    #mainDisplay {
+      all: unset;
+      padding: -10px;
       width: 100%;
       height: 100%;
-      border: none;
+      overflow: scroll;
+      user-select: none;  
+    }
+    
+    .ui-dialog {
+      overflow: hidden;
       box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+      padding: 0;
+    }
+    
+    .ui-dialog-titlebar {
+      height: 5px;
+      padding: 0;
+      z-index: 10;
+      background: grey;
+    }
+    
+    .no-close .ui-dialog-titlebar-close {
+      display: none;
     }
   
   </style>
