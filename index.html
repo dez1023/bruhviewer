@@ -1,130 +1,224 @@
 <html>
-   <head>
-      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-   </head>
-   <body>
-      <div id="urlBar">
-         <input id="urlInput" type="url" placeholder="https://example.com" value="https://example.com">
-         <button id="goButton" onclick="displayWebsite()">Go</button>
-         <input id="zoomInput" type="range" min="50" max="200" value="100" step="10">
-         <label for="zoomInput">Zoom</label>
-      </div>
-      <iframe id="mainDisplay"></iframe>
-   </body>
-   <style>
-      body {
-      margin: 0;
-      user-select: none;
-      background: #504c54;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      }
-      #urlBar {
-      position: fixed;
-      z-index: 10;
-      padding: 5px;
-      border-radius: 0 0 0px 5px;
-      box-shadow: 0px 0px 3px rgba(0,0,0,0.5);
-      background: white;
-      right: 0;
-      }
-      #mainDisplay {
-      all: unset;
-      width: 100%;
-      height: 100%;
-      overflow: scroll;
-      user-select: none;  
-      background: white;
-      }
-      .ui-dialog {
-      all: unset;
-      position: fixed;
-      display: block;
-      overflow: hidden;
-      background: darkgrey;
-      box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
-      border: 5px solid black;
-      z-index: 1;
-      height: 210px;
-      width: 210px;
-      }
-      .ui-dialog-titlebar {
-      z-index: 10;
-      background: grey;
-      border-radius: 0;
-      }
-      .ui-resizable-helper { 
-      border: 2px solid white;
-      border-radius: 5px;
-      }
-      .no-close .ui-dialog-titlebar-close, .ui-dialog-content, .ui-dialog-title {
-      display: none;
-      }
-   </style>
-   <script>
-      const urlInput = document.getElementById("urlInput");
-      const goButton = document.getElementById("goButton");
-      const zoomInput = document.getElementById("zoomInput")
-      const mainDisplay = document.getElementById("mainDisplay");
-      
-      function displayWebsite() {
+
+<head>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+</head>
+
+<body>
+    <div id="urlBar">
+        <button id="toggleURLBarBtn" onclick="toggleURLBar()">-</button>
+        <div id="barWidgets">
+          <input id="zoomInput" type="range" min="50" max="200" value="100" step="10">
+          <input id="urlInput" type="url" placeholder="https://example.com" value="https://example.com">
+        </div>
+    </div>
+    <iframe id="mainDisplay"></iframe>
+</body>
+
+<style>
+    body {
+        margin: 0;
+        user-select: none;
+        background: #504c54;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+    }
+
+    input[type="url"] {
+        all: unset;
+        border-bottom: 1px solid grey;
+        font-family: Verdana, sans-serif;
+        color: white;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        background: grey;
+        border-radius: 50px;
+        height: 5px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        background: red;
+        padding: 5px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -4px;
+    }
+    
+  button {
+    all: unset;
+    background: grey;
+    color: white;
+    padding: 5px;
+    width: 18px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  button:hover {
+    background: darkgrey;
+  }
+  
+  button:active {
+    background: dimgrey;
+    transition: 0s;
+  }
+
+    #urlBar {
+        position: fixed;
+        z-index: 10;
+        padding: 5px;
+        border-radius: 5px 0 0 0;
+        box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+        background: white;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    #urlBar>* {
+        margin: 5px;
+    }
+    
+  #barWidgets {
+    display: inline;
+  }
+
+    #mainDisplay {
+        all: unset;
+        overflow: scroll;
+        user-select: none;
+        background: white;
+        width: 210px;
+        height: 210px;
+    }
+
+    .ui-dialog {
+        all: unset;
+        position: fixed;
+        overflow: hidden;
+        background: darkgrey;
+        box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5);
+        border: 5px solid black;
+        z-index: 1;
+    }
+
+    .ui-dialog-titlebar {
+        z-index: 10;
+        background: grey;
+        border-radius: 0;
+    }
+
+    .ui-resizable-helper {
+        border: 2px solid white;
+        border-radius: 5px;
+    }
+
+    .no-close .ui-dialog-titlebar-close,
+    .ui-dialog-content,
+    .ui-dialog-title {
+        display: none;
+    }
+</style>
+
+<script>
+    const urlBar = document.getElementById("urlBar");
+    const urlInput = document.getElementById("urlInput");
+    const goButton = document.getElementById("goButton");
+    const zoomInput = document.getElementById("zoomInput")
+    const mainDisplay = document.getElementById("mainDisplay");
+    const barWidgets = document.getElementById("barWidgets");
+    const toggleURLBarBtn = document.getElementById("toggleURLBarBtn");
+    let showBar = true;
+
+    function displayWebsite() {
         const url = urlInput.value;
         if (url) {
-          console.log("valid");
-          mainDisplay.src = url;
-        }else{
-          console.log("naw");
+            console.log("valid");
+            mainDisplay.src = url;
+        } else {
+            console.log("naw");
         }
-      }
-      
-      function updateDisplay() {
+    }
+
+    function updateDisplay() {
         const scale = zoomInput.value;
-        const scaleRatio = scale/100;
+        const scaleRatio = scale / 100;
         const parent = mainDisplay.parentNode;
-        mainDisplay.style.zoom = scale +"%";
+        mainDisplay.style.zoom = scale + "%";
         mainDisplay.style.width = "100%";
         mainDisplay.style.height = "100%";
+    }
+    
+    function toggleURLBar() {
+      showBar = !showBar;
+      if (showBar) {
+        barWidgets.style.display = "inline";
+        toggleURLBarBtn.textContent = "-";
+      }else{
+        barWidgets.style.display = "none";
+        toggleURLBarBtn.textContent = "+";
       }
-      
-      
-      $("#mainDisplay").dialog({
-      dialogClass: "no-close",
-      })
-      
-      let widget = $("#mainDisplay").dialog("widget")
-      
-      widget.resizable("destroy").resizable({
-      helper: "ui-resizable-helper",
-      start: function() {mainDisplay.style.pointerEvents = "none"},
-      stop: function() {mainDisplay.style.pointerEvents = "auto"; updateDisplay()},
-      minHeight: 210,
-      minWidth: 210,
-      resize: updateDisplay,
-      handles: "n, e, s, w, ne, se, sw, nw",
-      });
-      
-      const draggable = widget.draggable("destroy").draggable({
-      iframeFix: true,
-      containment: "window",
-      scroll: false,
-      });
-      
-      $(window).on('resize', function() {
-      const position = $("#mainDisplay").offset()
-      widget.css({
-      left: Math.min(position.left, $(window).width() - $("#mainDisplay").width()) +"px",
-      top: Math.min(position.top-16.1, $(window).height() - $("#mainDisplay").height()) +"px",
-      })
-      });
-      
-      zoomInput.addEventListener("input", (event) => {
-      updateDisplay();
-      });
-      
-      updateDisplay();
-      
-   </script>
+    }
+
+    urlInput.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            displayWebsite();
+        }
+    });
+
+
+    $("#mainDisplay").dialog({
+        dialogClass: "no-close",
+        width: 210,
+        height: "auto",
+    })
+
+    let widget = $("#mainDisplay").dialog("widget")
+
+    widget.resizable("destroy").resizable({
+        helper: "ui-resizable-helper",
+        start: function() {
+            mainDisplay.style.pointerEvents = "none"
+        },
+        stop: function() {
+            mainDisplay.style.pointerEvents = "auto";
+            updateDisplay()
+        },
+        minHeight: 100,
+        minWidth: 100,
+        resize: updateDisplay,
+        handles: "n, e, s, w, ne, se, sw, nw",
+    });
+
+    const draggable = widget.draggable("destroy").draggable({
+        iframeFix: true,
+        containment: "window",
+        scroll: false,
+    });
+
+    $(window).on('resize', function() {
+        const position = widget.offset()
+        widget.css({
+            left: Math.min(position.left, $(window).width() - widget.width() - 10) + "px",
+            top: Math.min(position.top, $(window).height() - widget.height() - 10) + "px",
+            width: Math.min(widget.width(), $(window).width() - 10) + "px",
+            height: Math.min(widget.height(), $(window).height() - 10) + "px",
+        })
+    });
+
+    zoomInput.addEventListener("input", (event) => {
+        updateDisplay();
+    });
+
+    updateDisplay();
+</script>
+
 </html>
