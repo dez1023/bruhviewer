@@ -10,11 +10,11 @@
     <div id="urlBar">
         <button id="toggleURLBarBtn" onclick="toggleURLBar()">-</button>
         <div id="barWidgets">
-          <input id="zoomInput" type="range" min="50" max="200" value="100" step="10">
-          <input id="urlInput" type="url" placeholder="https://example.com" value="https://example.com">
+            <input id="urlInput" type="url" placeholder="https://example.com" value="https://example.com">
+            <input id="zoomInput" type="range" min="10" max="200" value="100" step="10">
         </div>
     </div>
-    <iframe id="mainDisplay"></iframe>
+    <iframe id="mainDisplay" referrerpolicy="same-origin"></iframe>
 </body>
 
 <style>
@@ -29,53 +29,49 @@
 
     input[type="url"] {
         all: unset;
-        border-bottom: 1px solid grey;
+        border: 1px solid grey;
         font-family: Verdana, sans-serif;
-        color: white;
-    }
-
-    input[type="range"]::-webkit-slider-runnable-track {
-        background: grey;
         border-radius: 50px;
-        height: 5px;
+        padding: 5px 10px 5px 10px;
+        color: white;
+        font-size: 12px;
+        transition: border 0.2s;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        background: red;
-        padding: 5px;
-        border-radius: 50%;
-        cursor: pointer;
-        margin-top: -4px;
+    input[type="url"]:hover,
+    input[type="url"]:focus {
+        border: 1px solid white;
     }
-    
-  button {
-    all: unset;
-    background: grey;
-    color: white;
-    padding: 5px;
-    width: 18px;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  button:hover {
-    background: darkgrey;
-  }
-  
-  button:active {
-    background: dimgrey;
-    transition: 0s;
-  }
+
+    button {
+        all: unset;
+        border: 1px solid grey;
+        color: white;
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: white;
+        color: black;
+    }
+
+    button:active {
+        background: dimgrey;
+        transition: 0s;
+    }
 
     #urlBar {
         position: fixed;
         z-index: 10;
         padding: 5px;
         border-radius: 5px 0 0 0;
-        box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(100, 100, 100);
         background: white;
         right: 0;
         bottom: 0;
@@ -86,16 +82,21 @@
     #urlBar>* {
         margin: 5px;
     }
-    
-  #barWidgets {
-    display: inline;
-  }
+
+    #barWidgets {
+        display: inline;
+    }
+
+    #barWidgets>* {
+        margin-right: 5px;
+        vertical-align: middle;
+    }
 
     #mainDisplay {
         all: unset;
         overflow: scroll;
         user-select: none;
-        background: white;
+        background: dimgrey;
         width: 210px;
         height: 210px;
     }
@@ -106,14 +107,15 @@
         overflow: hidden;
         background: darkgrey;
         box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5);
-        border: 5px solid black;
         z-index: 1;
+        border-radius: 5px;
     }
 
     .ui-dialog-titlebar {
         z-index: 10;
-        background: grey;
+        background: rgb(70, 70, 70);
         border-radius: 0;
+        border: none;
     }
 
     .ui-resizable-helper {
@@ -156,16 +158,16 @@
         mainDisplay.style.width = "100%";
         mainDisplay.style.height = "100%";
     }
-    
+
     function toggleURLBar() {
-      showBar = !showBar;
-      if (showBar) {
-        barWidgets.style.display = "inline";
-        toggleURLBarBtn.textContent = "-";
-      }else{
-        barWidgets.style.display = "none";
-        toggleURLBarBtn.textContent = "+";
-      }
+        showBar = !showBar;
+        if (showBar) {
+            barWidgets.style.display = "inline";
+            toggleURLBarBtn.textContent = "-";
+        } else {
+            barWidgets.style.display = "none";
+            toggleURLBarBtn.textContent = "+";
+        }
     }
 
     urlInput.addEventListener('keyup', function(event) {
@@ -198,11 +200,17 @@
         handles: "n, e, s, w, ne, se, sw, nw",
     });
 
-    const draggable = widget.draggable("destroy").draggable({
+    widget.draggable("destroy").draggable({
         iframeFix: true,
         containment: "window",
         scroll: false,
     });
+
+    widget.css({
+        border: "1px solid dimgrey",
+        width: "210px",
+        height: "210px",
+    })
 
     $(window).on('resize', function() {
         const position = widget.offset()
