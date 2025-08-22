@@ -14,7 +14,7 @@
             <input id="zoomInput" type="range" min="10" max="200" value="100" step="10">
         </div>
     </div>
-    <embed id="mainDisplay" referrerpolicy="same-origin">
+  <iframe id="mainDisplay" referrerpolicy="unsafe-url" sandbox="allow-same-origin"></iframe>
 </body>
 
 <style>
@@ -204,6 +204,7 @@
         iframeFix: true,
         containment: "window",
         scroll: false,
+        cursor: "grab",
     });
 
     widget.css({
